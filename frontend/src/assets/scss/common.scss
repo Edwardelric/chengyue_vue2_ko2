@@ -1,0 +1,24 @@
+@import "./_reset";
+@import "./_mixins";
+@import "./icon";
+
+body {
+ font-family: "PingFang SC",miui,system-ui,-apple-system,BlinkMacSystemFont,Helvetica Neue,Helvetica,sans-serif;
+}
+
+.flex {
+  @include flex;
+}
+
+input::-webkit-input-placeholder {
+  color: #969799;
+}
+.own-popup {
+  .btns {
+    height: rem(44);
+    padding: 0 rem(20);
+    border-bottom: 1px solid #ebedf0;
+    color: #1989fa;
+    font-size: 14px;
+  }
+}
