@@ -57,10 +57,12 @@
     flex-flow: row wrap;
     justify-content: space-between;
     margin: rem(10) rem(16);
+      background: $gray;
     .goods {
       flex: 0 0 rem(164);
       margin-bottom: rem(10);
       border: 1px solid rgb(237, 237, 237);
+        background: $white;
       .goods-img {
         height: rem(168);
         margin-bottom: rem(8);

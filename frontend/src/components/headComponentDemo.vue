@@ -85,7 +85,7 @@
     font-size: 14px;
     .header-search {
       display: flex;
-      align-items: center;
+      line-height: 24px;
       padding:rem(5) rem(10) rem(5) rem(10);
       border-radius: 4px;
       background: $white;

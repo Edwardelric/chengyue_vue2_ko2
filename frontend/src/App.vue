@@ -1,13 +1,13 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
+    <div id="app">
+        <router-view></router-view>
+    </div>
 </template>
 
 <script type="text/ecmascript-6">
 </script>
 
 <style lang="scss">
-  @import "./assets/scss/common";
+    @import "./assets/scss/common";
 </style>
 
