@@ -1,11 +1,17 @@
 <template>
     <div class="filter-bar">
         <ul class="flex filter-tab">
-            <li :class="{active: tabIndex === 0}" @click="tabIndex = 0">信用</li>
-            <li :class="{active: tabIndex === 1}" @click="tabIndex = 1">综合</li>
-            <li class="flex" :class="{active: tabIndex === 2}" @click="tabIndex = 2; showFilterContent = true">
-                <span>筛选</span>
-                <van-icon name="filter-o" />
+            <li :class="{active: tabIndex === 0}" @click="tabIndex = 0">信用<van-icon name="arrow-down"/></li>
+            <li :class="{active: tabIndex === 1}" @click="tabIndex = 1">综合<van-icon name="arrow-down"/></li>
+            <li class="flex" :class="{active: tabIndex === 2}" @click="tabIndex = 2;">
+                <div class="view-type" @click="viewType = viewType === 0 ? 1 : 0">
+                    <van-icon name="qr" v-if="viewType === 0" />
+                    <van-icon name="filter-o" v-if="viewType === 1"/>
+                </div>
+                <div class="flex" @click="showFilterContent = true">
+                    <span>筛选</span>
+                    <van-icon name="filter-o" />
+                </div>
             </li>
         </ul>
         <div class="own-mask" @click="showFilterContent = false" :class="{active: showFilterContent}"></div>
@@ -23,7 +29,7 @@
                 </van-collapse-item>
                 <van-collapse-item title="学历" name="edu">
                     <dl class="filter-item">
-                        <dt>学历</dt>
+                        <dt></dt>
                         <dd v-for="(item, index) in education"
                             :key="index"
                             @click="filterClick(0, index)"
@@ -33,7 +39,7 @@
                 </van-collapse-item>
                 <van-collapse-item title="待遇" name="salary">
                     <dl class="filter-item">
-                        <dt>薪水</dt>
+                        <dt></dt>
                         <dd v-for="(item, index) in salary"
                             :key="index"
                             @click="filterClick(1, index)"
@@ -42,6 +48,10 @@
                     </dl>
                 </van-collapse-item>
             </van-collapse>
+            <div class="btn-groups">
+                <p class="own-btns own-btns-primary" @click="confirm">确定</p>
+                <p class="own-btns" @click="cancel">重设</p>
+            </div>
         </div>
     </div>
 </template>
@@ -55,29 +65,46 @@
         data() {
         	return {
         		tabIndex: 0,
-				activeNames: ['province'],
+				activeNames: ['industry'],
                 showFilterContent: false,
 				company,
 				education,
-				salary
+				salary,
+                viewType: 0
             }
         },
         created() {
-        	this.company.forEach((item, index) => {
-        		if (item.value) {
-        			this.company[index].value.forEach((subItem, subIndex) => {
-        				this.$set(this.company[index].value[subIndex], 'selected', false);
-                    });
-                }
-            });
-            let arr = [this.education, this.salary];
-            arr.forEach((item, index) => {
-            	item.forEach((subItem, subIndex) => {
-            		this.$set(item[subIndex], 'selected', false);
-                })
-            })
+        	this.init();
         },
         methods: {
+        	init(flag) {
+				this.company.forEach((item, index) => {
+					if (item.value) {
+                        item.value.forEach((subItem, subIndex) => {
+                        	if (!flag) {
+                        		// 初始化添加到obs
+								this.$set(item.value[subIndex], 'selected', false);
+                            } else {
+                        		// 重置select为false
+                        	    item.value[subIndex].selected = false;
+                            }
+                        });
+                    }
+				});
+				let arr = [this.education, this.salary];
+				arr.forEach((item, index) => {
+					item.forEach((subItem, subIndex) => {
+						if (!flag) {
+							// 初始化天骄到obs
+							this.$set(item[subIndex], 'selected', false);
+                        } else {
+							// 重置select为false
+							item[subIndex].selected = false;
+                        }
+
+					})
+				})
+            },
 			filterCompanyClick(clickIndex, clickSubIndex) {
 				// 点击单选和反选
                 if (!clickSubIndex) {
@@ -108,6 +135,14 @@
 					tmp[0].selected = false;
 					tmp[clickIndex].selected = !tmp[clickIndex].selected;
 				}
+            },
+            confirm() {
+			    this.showFilterContent = false;
+            },
+            cancel() {
+        		// 重置
+                this.init(true);
+				this.showFilterContent = false;
             }
         }
     }
@@ -126,13 +161,31 @@
             color: $gray-lighter;
             font-size: rem(12);
             li {
+                flex: 1;
                 padding: rem(8) rem(10);
-                border: 1px solid $gray-lighter;
                 border-radius: 6px;
-                color: $gray-lighter;;
+                color: $gray-lighter;
+                i {
+                    vertical-align: middle;
+                }
                 &.active {
-                    border: 1px solid $green;
                     color: $green;
+                    .view-type {
+                        color: $gray;
+                    }
+                }
+                &:last-of-type {
+                    justify-content: flex-end;
+                    text-align: right;
+                }
+                .view-type {
+                    margin-right: rem(10);
+                    padding-right: rem(6);
+                    border-right: 2px solid $gray;
+                    i {
+                        font-size: 16px;
+                        line-height: inherit;
+                    }
                 }
             }
             i {
@@ -142,9 +195,9 @@
         .filter-content {
             position: fixed;
             top: 0;
-            right: -91%;
+            right: -92%;
             z-index: 100;
-            width: 90%;
+            width: calc(100% - 48px);
             height: 100%;
             overflow-y: scroll;
             background: $white;
@@ -169,6 +222,9 @@
                         color: $green;
                     }
                 }
+            }
+            .btn-groups {
+                margin: rem(20) rem(10);
             }
         }
     }

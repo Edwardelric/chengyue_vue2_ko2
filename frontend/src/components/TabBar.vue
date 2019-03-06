@@ -29,9 +29,6 @@
     @import "../assets/scss/_mixins";
 
     .tabbar-wrapper {
-        position: fixed;
-        left: 0;
-        bottom: 0;
         width: 100%;
         height: rem(50);
         border-top: 1px solid $gray;
@@ -45,7 +42,6 @@
             i {
                 font-size: rem(22);
             }
-
             &.active {
                 color: $green;
             }

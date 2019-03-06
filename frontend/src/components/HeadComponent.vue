@@ -3,35 +3,26 @@
         <van-row class="header" type="flex" align="center">
             <van-col span="3" class="logo">
                 <img src="../assets/images/home/home.jpeg" @click="goTo"/>
+                <!--登录-->
             </van-col>
             <van-col span="18">
-                <!--<div class="header-search">-->
-                    <!--&lt;!&ndash;<div class="search-type">&ndash;&gt;-->
-                        <!--&lt;!&ndash;<span @click="showPopup = true">{{areaName}}</span>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<van-icon name="arrow-down" />&ndash;&gt;-->
-                        <!--&lt;!&ndash;<span>|</span>&ndash;&gt;-->
-                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-                    <!--<van-icon name="search" class="search-icon"/>-->
-
-                    <!--<div class="search-input">-->
-                        <!--<input type="text" placeholder="请输入搜索内容" v-model="searchVal">-->
-                        <!--<van-icon name="clear" class="clear-btn" v-if="searchVal.length" @click="clearSearchVal"/>-->
-                    <!--</div>-->
-                <!--</div>-->
-                <div class=" header-search" style="display: flex; align-items: center;background: rgb(255, 255, 255);border-radius: 4px;">
-
-                        <div class="van-cell1">
-                            <van-icon name="search" class="search-icon"/>
-                            <div class="search-input">
-                                <input type="text" placeholder="请输入搜索内容" v-model="searchVal">
-                            </div>
-                        </div>
-
+                <div class="search">
+                    <div class="area">
+                        <span @click="showPopup = true">{{areaName}}</span>
+                        <van-icon name="arrow-down" />
+                        <span>|</span>
+                    </div>
+                    <div class="search-icon-wrap">
+                        <van-icon name="search" class="search-icon"/>
+                    </div>
+                    <div class="search-input">
+                        <input type="text" placeholder="请输入搜索内容" v-model="searchVal">
+                        <van-icon name="clear" class="clear-btn" v-if="searchVal.length" @click="clearSearchVal"/>
+                    </div>
                 </div>
             </van-col>
             <van-col span="3" class="login">
-                <router-link to="/login">登录</router-link>
+                <router-link to="/login">搜索</router-link>
             </van-col>
         </van-row>
         <van-popup v-model="showPopup" position="bottom">
@@ -46,7 +37,7 @@
 	export default {
 		data() {
 			return {
-                searchVal: '请输入搜索内容请输入搜索内容请输入搜索内容',
+                searchVal: '请输入搜索内容请输入请输入',
 				area,
 				areaData: [],
 				showPopup: false
@@ -84,72 +75,69 @@
 <style lang="scss">
     @import "../assets/scss/_mixins";
 
-    .van-cell1 {
-        width: 100%;
-        flex: 1;
-        display: flex;
-        padding: 5px 10px;
-        line-height: 24px;
-        position: relative;
-        background-color: #fff;
-        color: #323233;
-        font-size: 14px;
-        overflow: hidden;
-    }
     .header {
         height: rem(58);
-        padding: 0  rem(16);
+        padding: 0 rem(16);
         background: $green;
         color: $white;
-        font-size: rem(14);
+        font-size: 14px;
         .logo {
+            width: 32px;
+            height: 32px;
             margin-right: 10px;
+            line-height: 32px;
             img {
-                width: 90%;
+                width: 32px;
+                height: 32px;
                 border-radius: 50%;
             }
         }
-        .header-search {
+        .search {
             display: flex;
-            align-items: center;
-            /*padding: 5px 10px;*/
+            padding: 4px 10px;
             border-radius: 4px;
-            background: $blue;
-            .search-type {
+            background: $white;
+            color: $gray;
+            line-height: 24px;
+            .area {
                 display: flex;
                 align-items: center;
                 color: $gray-lighter;
-                font-size: rem(12);
-                i {
-                    margin-left: rem(3);
-                }
+                font-size: 12px;
                 span:nth-of-type(2) {
-                    padding: 0 rem(10) 0 rem(5);
+                    padding: 0 5px;
                 }
             }
-            .search-icon {
-                display: block;
-                margin-right: rem(5);
-                color: $gray-lighter;
-                font-size: rem(16);
-                line-height: inherit;
+            .search-icon-wrap {
+                margin-right: 5px;
+                i {
+                    display: block;
+                    color: #323233;
+                    font-size: 16px;
+                    line-height: inherit;
+                }
             }
             .search-input {
                 flex: 1;
                 display: flex;
                 align-items: center;
-                text-align: left;
                 input {
+                    display: block;
                     width: 100%;
-                    border: 0;
                     margin: 0;
                     padding: 0;
-                    resize: none;
+                    transform: translateY(1px);
+                    border: 0;
                     color: #323233;
+                    resize: none;
+                    background-color: transparent;
                 }
                 .clear-btn {
+                    display: block;
+                    margin-left: 10px;
                     color: $gray-lighter;
-                    font-size: rem(16);
+                    font-size: 16px;
+                    line-height: inherit;
                 }
             }
         }

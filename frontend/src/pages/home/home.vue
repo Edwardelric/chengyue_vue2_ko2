@@ -3,8 +3,8 @@
         <HeadComponent></HeadComponent>
         <NavComponent></NavComponent>
         <FilterBar></FilterBar>
-        <SwiperComponent></SwiperComponent>
-        <!--<GoodsComponent></GoodsComponent>-->
+        <!--<SwiperComponent></SwiperComponent>-->
+        <ListComponent></ListComponent>
         <TabBar></TabBar>
     </div>
 </template>
@@ -14,23 +14,12 @@
     import NavComponent from '@/components/NavComponent';
     import SwiperComponent from '@/components/SwiperComponent';
     import FilterBar from '@/components/FilterBar';
-    import GoodsComponent from '@/components/GoodsComponent';
+    import ListComponent from '@/components/ListComponent';
     import TabBar from '@/components/TabBar';
 
     export default {
 		data() {
-			return {
-                value: '',
-                actions: [
-                  {
-                    name: '选项'
-                  },
-                  {
-                    name: '选项',
-                    subname: '描述信息'
-                  }
-                ]
-            };
+			return {};
 		},
         methods: {
             onSelect() {}
@@ -42,10 +31,17 @@
             NavComponent,
             SwiperComponent,
 			FilterBar,
-            GoodsComponent,
+			ListComponent,
 			TabBar
         }
 	};
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+    .home {
+        display: flex;
+        flex-flow: column nowrap;
+
+        height: 100%;
+    }
+</style>
