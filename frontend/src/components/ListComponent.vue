@@ -1,34 +1,94 @@
 <template>
     <div class="list-wrapper">
         <div class="list-content">
-        <LoadMore
-                v-model="loading"
-                v-bind="options"
-                @refresh="refresh"
-                @loadMore="loadMore"
-        >
-            <p slot="refreshDesc" class="loading-bg">下拉加载</p>
-            <p slot="refreshNoData" class="loading-bg">开始加载</p>
-            <ul v-if="listType === 0">
-                <li class="flex company-item" v-for="(item, index) in listData" :key="index">
-                    <div class="company-logo"><img src="../assets/images/home/home.jpeg"/></div>
-                    <div class="intro">
-                        <h5>灯泡渠道商</h5>
-                        <span>这个是公司</span>
-                        <dl>
-                            <dt>地点: </dt>
-                            <dd>上海市</dd>
-                            <dt>成立:</dt>
-                            <dd>2018</dd>
-                        </dl>
-                    </div>
-                    <div class="price">￥100/单
-                    </div>
-                </li>
-            </ul>
-            <p slot="loadMoreDesc" class="loading-bg">当前正在加载中...</p>
-            <p slot="loadMoreNoData" class="loadMoreNoData">暂无更多数据</p>
-        </LoadMore>
+            <van-tabs v-model="active" sticky>
+                <van-tab title="玻璃">
+                    <LoadMore
+                            v-model="loading[0]"
+                            v-bind="options[0]"
+                            @refresh="refresh(0)"
+                            @loadMore="loadMore(0)"
+                    >
+                        <p slot="refreshDesc" class="loading-bg">下拉加载</p>
+                        <p slot="refreshNoData" class="loading-bg">开始加载</p>
+                        <ul>
+                            <li class="flex company-item" v-for="(item, index) in listData[0]" :key="index" @click="gotoDetail(listData[index])">
+                                <div class="company-logo"><img :src="item.logo"/></div>
+                                <div class="intro">
+                                    <h5>{{item.product}}</h5>
+                                    <span>{{item.companyName}}</span>
+                                    <dl>
+                                        <dt>客户群: </dt>
+                                        <dd v-for="(subItem, subIndex) in item.client" :key="subIndex">{{subItem}}</dd>
+                                    </dl>
+                                </div>
+                                <div class="price">￥{{item.price}}
+                                </div>
+                            </li>
+                        </ul>
+                        <p slot="loadMoreDesc" class="loading-bg">当前正在加载中...</p>
+                        <p slot="loadMoreNoData" class="loadMoreNoData">暂无更多数据</p>
+                    </LoadMore>
+                </van-tab>
+                <van-tab title="铝合金">
+                    <LoadMore
+                            v-model="loading[1]"
+                            v-bind="options[1]"
+                            @refresh="refresh(1)"
+                            @loadMore="loadMore(1)"
+                    >
+                        <p slot="refreshDesc" class="loading-bg">下拉加载</p>
+                        <p slot="refreshNoData" class="loading-bg">开始加载</p>
+                        <ul>
+                            11
+                            <li class="flex company-item" v-for="(item, index) in listData[1]" :key="index" @click="gotoDetail(listData[index])">
+                                <div class="company-logo"><img :src="item.logo"/></div>
+                                <div class="intro">
+                                    <h5>{{item.product}}</h5>
+                                    <span>{{item.companyName}}</span>
+                                    <dl>
+                                        <dt>客户群: </dt>
+                                        <dd v-for="(subItem, subIndex) in item.client" :key="subIndex">{{subItem}}</dd>
+                                    </dl>
+                                </div>
+                                <div class="price">￥{{item.price}}
+                                </div>
+                            </li>
+                        </ul>
+                        <p slot="loadMoreDesc" class="loading-bg">当前正在加载中...</p>
+                        <p slot="loadMoreNoData" class="loadMoreNoData">暂无更多数据</p>
+                    </LoadMore>
+                </van-tab>
+                <van-tab title="钢化门">
+                    <LoadMore
+                            v-model="loading[2]"
+                            v-bind="options[2]"
+                            @refresh="refresh(2)"
+                            @loadMore="loadMore(2)"
+                    >
+                        <p slot="refreshDesc" class="loading-bg">下拉加载</p>
+                        <p slot="refreshNoData" class="loading-bg">开始加载</p>
+                        <ul>
+                            22
+                            <li class="flex company-item" v-for="(item, index) in listData[2]" :key="index" @click="gotoDetail(listData[index])">
+                                <div class="company-logo"><img :src="item.logo"/></div>
+                                <div class="intro">
+                                    <h5>{{item.product}}</h5>
+                                    <span>{{item.companyName}}</span>
+                                    <dl>
+                                        <dt>客户群: </dt>
+                                        <dd v-for="(subItem, subIndex) in item.client" :key="subIndex">{{subItem}}</dd>
+                                    </dl>
+                                </div>
+                                <div class="price">￥{{item.price}}
+                                </div>
+                            </li>
+                        </ul>
+                        <p slot="loadMoreDesc" class="loading-bg">当前正在加载中...</p>
+                        <p slot="loadMoreNoData" class="loadMoreNoData">暂无更多数据</p>
+                    </LoadMore>
+                </van-tab>
+            </van-tabs>
         </div>
     </div>
 </template>
@@ -37,69 +97,68 @@
     import {URL} from '@/utils/serviceAPI.js';
     import {Toast} from 'vant';
     import LoadMore from './ed-load-more/index';
+    import listData from '../../mock/goods';
 
 	export default {
 		data() {
 			return {
-                listType: 0,
-				listData: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-				loading: false,
-				options: {
-					enableRefresh: true,
-					additionalX: 50,
-					duration: 300,
-					refreshFinished: false,
-					refreshClassName: 'refreshClassName',
-					refreshNoData: 'refreshNoData',
-					enableLoadMore: true,
-					immediateCheck: false,
-					distance: 10,
-					loadMoreFinished: false,
-					loadMoreClassName: 'loadMoreClassName',
-					loadMoreNoData: 'loadMoreNoData'
-				},
+				active: 0,
+				listData: [
+					listData.slice(),
+					listData.slice(),
+					listData.slice()
+                ],
+				loading: [
+					false,
+                    false,
+                    false
+                ],
+				options: [
+					{
+						loadMoreNoData: false
+					}, {
+
+						loadMoreNoData: false
+					}, {
+
+						loadMoreNoData: false
+					},
+                ]
             };
 		},
+        created() {
+        },
         methods: {
-            gotoDetail(goodId) {
-                this.$router.push({name: 'Goods', params: {goodId}})
+            gotoDetail(goodData) {
+                this.$router.push({name: 'Goods', query: {goodData}})
             },
-			refresh() {
+			refresh(index) {
 				setTimeout(() => {
-					for (let i = 0; i < 5; i++) {
-						this.listData.unshift(this.listData.length + 1);
-					}
-					// 加载状态结束
-					this.loading = false;
-
+                    this.listData[index].unshift(this.listData[index].length + 1);
+                    // 加载状态结束
+					this.loading[index] = false;
 					// 数据全部加载完成
-					if (this.listData.length >= 30) {
-						this.options.refreshFinished = true;
+					if (this.listData[index].length >= 2) {
+						this.options[index].loadMoreNoData = true;
 					}
-					console.log(this.list);
 				}, 600);
 			},
-			loadMore(arg) {
-				this.$ajax.post('https://www.easy-mock.com/mock/592e626b91470c0ac1fed9b6/products_1496212075258/moneylist#!method=post').then(res => {
+			loadMore(index) {
+				setTimeout(() => {
+                    for (let i = 0; i < 5; i++) {
+                        this.listData[index].push(this.listData[index].length + 1);
+                    }
+                    // 加载状态结束
+                    this.loading[index] = false;
 
-				}).catch(err => {
-
-				}).finally(() => {
-					for (let i = 0; i < 5; i++) {
-						this.listData.push(this.listData.length + 1);
-					}
-					// 加载状态结束
-					this.loading = false;
-
-					// 数据全部加载完成
-					if (this.listData.length >= 30) {
-						this.options.loadMoreFinished = true;
-					}
-				})
+                    // 数据全部加载完成
+                    if (this.listData[index].length >= 2) {
+                        this.options[index].loadMoreNoData = true;
+                    }
+				}, 600);
 			}
         },
-        mounted() {
-        },
+        mounted() {},
         components: {
 			LoadMore
         }
@@ -127,8 +186,6 @@
             border-bottom: rem(6) solid $gray;
             .company-logo {
                 width: rem(60);
-                height: rem(60);
-
                 img {
                     width: 100%;
                     border-radius: 50%;
@@ -140,9 +197,9 @@
                 flex-flow: column nowrap;
                 justify-content: space-between;
                 align-items: flex-start;
-                height: rem(60);
                 padding-left: rem(14);
                 color: #61687c;
+                line-height: rem(26);
                 h5 {
                     font-size: rem(16);
                 }
@@ -157,9 +214,7 @@
                     }
                     dd {
                         display: inline-block;
-                        &:first-of-type {
-                            padding-right: rem(12);
-                        }
+                        padding-right: rem(4);
                     }
                 }
             }

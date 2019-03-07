@@ -11,6 +11,7 @@ import {
 	Area, AddressEdit,
 	Toast, Popup,
 	Collapse, CollapseItem,
+	Tab, Tabs
 } from 'vant';
 
 Vue.config.productionTip = false;
@@ -24,6 +25,7 @@ Vue.use(Ajax)
 	.use(Area).use(AddressEdit)
 	.use(Toast).use(Popup)
 	.use(Collapse).use(CollapseItem)
+	.use(Tab).use(Tabs)
 
 /* eslint-disable no-new */
 new Vue({

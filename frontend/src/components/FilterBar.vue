@@ -27,7 +27,7 @@
                         >{{subItem.name}}</dd>
                     </dl>
                 </van-collapse-item>
-                <van-collapse-item title="学历" name="edu">
+                <van-collapse-item title="学历" name="edu" v-if="false">
                     <dl class="filter-item">
                         <dt></dt>
                         <dd v-for="(item, index) in education"
@@ -37,7 +37,7 @@
                         >{{item.name}}</dd>
                     </dl>
                 </van-collapse-item>
-                <van-collapse-item title="待遇" name="salary">
+                <van-collapse-item title="待遇" name="salary" v-if="false">
                     <dl class="filter-item">
                         <dt></dt>
                         <dd v-for="(item, index) in salary"

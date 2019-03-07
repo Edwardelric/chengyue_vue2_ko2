@@ -57,7 +57,7 @@
     "tpo": "^1.1.4",
     "uglifyjs-webpack-plugin": "^1.1.1",
     "url-loader": "^0.5.8",
-    "vant": "^1.5.2",
+    "vant": "^1.5.9",
     "vue-loader": "^13.3.0",
     "vue-skeleton-webpack-plugin": "^1.1.11",
     "vue-style-loader": "^3.0.1",

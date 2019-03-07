@@ -7,6 +7,7 @@ import Login from '@/pages/login/login';
 import Goods from '@/pages/goods/goods';
 import Intro from '@/pages/company/intro';
 
+
 Vue.use(Router)
 
 const routes =  [

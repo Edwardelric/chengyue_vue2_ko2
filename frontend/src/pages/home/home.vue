@@ -1,11 +1,11 @@
 <template>
     <div class="home">
         <HeadComponent></HeadComponent>
-        <NavComponent></NavComponent>
-        <FilterBar></FilterBar>
+        <!--<NavComponent></NavComponent>-->
+        <!--<FilterBar></FilterBar>-->
         <!--<SwiperComponent></SwiperComponent>-->
         <ListComponent></ListComponent>
-        <TabBar></TabBar>
+        <!--<TabBar></TabBar>-->
     </div>
 </template>
 
@@ -41,7 +41,6 @@
     .home {
         display: flex;
         flex-flow: column nowrap;
-
         height: 100%;
     }
 </style>

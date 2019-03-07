@@ -37,7 +37,7 @@
 	export default {
 		data() {
 			return {
-                searchVal: '请输入搜索内容请输入请输入',
+                searchVal: '',
 				area,
 				areaData: [],
 				showPopup: false

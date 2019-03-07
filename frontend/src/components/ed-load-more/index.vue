@@ -5,20 +5,20 @@
         @touchmove="touchMoveHandler"
         @touchend="touchEndHandler"
     >
-        <div class="refresh-wraper" v-if="enableRefresh" :class="[this.refreshClassName, this.refreshNoData]">
-            <slot name="refreshDesc" v-if="!value">
+        <div class="refresh-wraper" v-if="enableRefresh">
+            <!--<slot name="refreshDesc" v-if="!value">-->
                 <p>{{statusTxt}}即可刷新</p>
-            </slot>
-            <slot name="refreshNoData" v-if="value">
-                <p>正在加载中</p>
-            </slot>
+            <!--</slot>-->
+            <!--<slot name="refreshNoData" v-if="value">-->
+                <!--<p>正在加载中</p>-->
+            <!--</slot>-->
         </div>
         <slot></slot>
-        <div class="load-more-wrapper" v-if="enableLoadMore" :class="[this.loadMoreClassName, this.loadMoreNoData]">
+        <div class="load-more-wrapper" v-if="enableLoadMore">
             <slot name="loadMoreDesc" v-if="value">
-                <div><EdSpinner/>加载中...</div>
+                <div>加载中...</div>
             </slot>
-            <slot name="loadMoreNoData" v-if="!value && loadMoreFinished">
+            <slot name="loadMoreNoData" v-if="!value && loadMoreNoData">
                 <p>无更多数据</p>
             </slot>
         </div>
@@ -53,18 +53,6 @@
                 type: Number,
                 default: 300
             },
-            refreshFinished: {
-                type: Boolean,
-                default: false
-            },
-            refreshClassName: {
-                type: String,
-                default: ''
-            },
-            refreshNoData: {
-                type: String,
-                default: ''
-            },
             enableLoadMore: {
                 type: Boolean,
                 default: true
@@ -77,17 +65,9 @@
             	type: Number,
                 default: 10
             },
-			loadMoreFinished: {
+			loadMoreNoData: {
                 type: Boolean,
                 default: false
-            },
-            loadMoreClassName: {
-                type: String,
-                default: ''
-            },
-            loadMoreNoData: {
-            	type: String,
-                default: ''
             }
         },
 		data() {
@@ -141,7 +121,7 @@
                 if (this.ceiling && this.deltaY) {
                     if (this.status === 'loosing') {
                         this.getStatus(this.additionalX, true);
-                        this.$emit('input', true);
+						this.$emit('input', true);
                         this.$emit('refresh', 'refresh');
                     } else {
                         this.getStatus(0);
@@ -157,8 +137,10 @@
                 return moveDistance < additionalX ? moveDistance : moveDistance < additionalX * 2 ? Math.round(additionalX + (moveDistance - additionalX) / 2) :  Math.round(additionalX * 1.5 + (moveDistance - additionalX * 2) / 4);
             },
             getStatus: function getStatus(moveDistance, isLoading) {
+
                 this.moveDistance = moveDistance;
                 let status = isLoading ? 'loading' : moveDistance === 0 ? '' : moveDistance < this.additionalX * 2 ? 'pulling' : 'loosing';
+                console.log('status', status, 2, isLoading);
                 if (status !== this.status) {
                     this.status = status;
                     this.statusTxt = ({pulling: '下拉', loosing: '释放'})[status];
@@ -171,7 +153,7 @@
                 }
             },
             check() {
-                if (this.value || this.loadMoreFinished) { return;}
+                if (this.value || this.loadMoreNoData) { return;}
                 let reachBottom = false;
                 let el = this.$el;
                 let scrollEventTarget = this.scrollEventTarget;
@@ -203,6 +185,7 @@
         },
         watch: {
             value(val) {
+            	console.log(val);
                 if (this.getCeiling() && this.enableRefresh) {
                     this.getStatus(val ? this.additionalX : 0, val);
                 }
