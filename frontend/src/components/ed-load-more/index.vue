@@ -6,21 +6,22 @@
         @touchend="touchEndHandler"
     >
         <div class="refresh-wraper" v-if="enableRefresh">
-            <!--<slot name="refreshDesc" v-if="!value">-->
-                <p>{{statusTxt}}即可刷新</p>
-            <!--</slot>-->
-            <!--<slot name="refreshNoData" v-if="value">-->
-                <!--<p>正在加载中</p>-->
-            <!--</slot>-->
+            <div v-if="!refreshNoData">
+                <span v-if="value">加载中...</span>
+                <div v-if="!value">
+                    <span v-if="refreshNoData">暂无更新数据</span>
+                    <span v-if="!refreshNoData">
+                        {{statusTxt ? statusTxt + '即可刷新...' : ''}}
+                    </span>
+                </div>
+            </div>
         </div>
         <slot></slot>
-        <div class="load-more-wrapper" v-if="enableLoadMore">
-            <slot name="loadMoreDesc" v-if="value">
-                <div>加载中...</div>
-            </slot>
-            <slot name="loadMoreNoData" v-if="!value && loadMoreNoData">
-                <p>无更多数据</p>
-            </slot>
+        <div class="loadmore-wrapper" v-if="enableLoadMore">
+            <div v-if="value">加载中...</div>
+            <div v-if="!value">
+                <span v-if="loadMoreNoData">无更多数据</span>
+            </div>
         </div>
     </div>
 </template>
@@ -37,33 +38,29 @@
                 type: Boolean,
                 default: false
             },
-			direction: {
-                type: String,
-                default: 'vertical'
-            },
-            enableRefresh: {
-                type: Boolean,
-                default: true
-            },
-            additionalX: {
-                type: Number,
-                default: 50
-            },
             duration: {
                 type: Number,
                 default: 300
             },
+			immediateCheck: {
+				type: Boolean,
+				default: false
+			},
+			enableRefresh: {
+				type: Boolean,
+				default: true
+			},
             enableLoadMore: {
                 type: Boolean,
                 default: true
             },
-            immediateCheck: {
-            	type: Boolean,
-                default: false
-            },
             distance: {
             	type: Number,
                 default: 10
+            },
+            refreshNoData: {
+                type: Boolean,
+                default: false
             },
 			loadMoreNoData: {
                 type: Boolean,
@@ -78,7 +75,9 @@
                 moveDistance: 0,
                 status: '',
                 statusTxt: '',
-				touched: false
+				touched: false,
+				additionalX: 50,
+				direction: 'vertical'
             };
 		},
         mounted() {
@@ -109,11 +108,9 @@
                     this.startY = event.touches[0].clientY;
                     this.deltaY = 0;
                 }
-                if (this.ceiling && this.deltaY >= 0) {
-                    if (this.direction === 'vertical') {
-                        this.getStatus(this.ease(this.deltaY));
-                        event.cancelable && event.preventDefault();
-                    }
+                if (this.ceiling && this.deltaY >= 0 && this.direction === 'vertical') {
+                    this.getStatus(this.ease(this.deltaY));
+                    event.cancelable && event.preventDefault();
                 }
             },
             touchEndHandler() {
@@ -122,7 +119,7 @@
                     if (this.status === 'loosing') {
                         this.getStatus(this.additionalX, true);
 						this.$emit('input', true);
-                        this.$emit('refresh', 'refresh');
+                        this.$emit('refresh');
                     } else {
                         this.getStatus(0);
                     }
@@ -135,12 +132,11 @@
             ease(moveDistance) {
                 let additionalX = this.additionalX;
                 return moveDistance < additionalX ? moveDistance : moveDistance < additionalX * 2 ? Math.round(additionalX + (moveDistance - additionalX) / 2) :  Math.round(additionalX * 1.5 + (moveDistance - additionalX * 2) / 4);
-            },
+			},
             getStatus: function getStatus(moveDistance, isLoading) {
-
-                this.moveDistance = moveDistance;
-                let status = isLoading ? 'loading' : moveDistance === 0 ? '' : moveDistance < this.additionalX * 2 ? 'pulling' : 'loosing';
-                console.log('status', status, 2, isLoading);
+            	this.moveDistance = moveDistance;
+                let status = isLoading ? 'loading' : moveDistance === 0 ? '' : moveDistance < this.additionalX * 1.5 ? 'pulling' : 'loosing';
+                console.log(status, 1, this.status);
                 if (status !== this.status) {
                     this.status = status;
                     this.statusTxt = ({pulling: '下拉', loosing: '释放'})[status];
@@ -160,14 +156,14 @@
                 let viewportScrollTop = ScrollTools.getScrollTop(scrollEventTarget);
                 let viewportBottom = viewportScrollTop + ScrollTools.getVisibleHeight(scrollEventTarget);
                 if (scrollEventTarget === el) {
-                  reachBottom = scrollEventTarget.scrollHeight - viewportBottom < this.distance;
+                    reachBottom = scrollEventTarget.scrollHeight - viewportBottom < this.distance;
                 } else {
-                  let elementBottom = ScrollTools.getElementTop(el) - ScrollTools.getElementTop(scrollEventTarget) + el.offsetHeight + viewportScrollTop;
-                  reachBottom = viewportBottom + this.distance >= elementBottom;
+                    let elementBottom = ScrollTools.getElementTop(el) - ScrollTools.getElementTop(scrollEventTarget) + el.offsetHeight + viewportScrollTop;
+                    reachBottom = viewportBottom + this.distance >= elementBottom;
                 }
                 if (reachBottom) {
-                  this.$emit('input', true);
-                  this.$emit('loadMore', 'loadMore');
+                    this.$emit('input', true);
+                    this.$emit('loadMore', 'loadMore');
                 }
             }
         },
@@ -185,7 +181,7 @@
         },
         watch: {
             value(val) {
-            	console.log(val);
+            	console.log('watchValue', val);
                 if (this.getCeiling() && this.enableRefresh) {
                     this.getStatus(val ? this.additionalX : 0, val);
                 }
@@ -194,7 +190,7 @@
 	};
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     @import "../ed-css/_mixins.scss";
     .load-refresh-wrapper {
         position: relative;
@@ -216,12 +212,11 @@
                 line-height: rem(20);
             }
         }
-        .load-more-wrapper {
+        .loadmore-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
             height: rem(40);
-            background: $white;
         }
     }
 </style>

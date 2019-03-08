@@ -39,8 +39,6 @@
 
 <style lang="scss" scoped>
     .home {
-        display: flex;
-        flex-flow: column nowrap;
-        height: 100%;
+        background: #fff;
     }
 </style>

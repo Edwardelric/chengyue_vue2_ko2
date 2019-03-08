@@ -17,6 +17,7 @@ input::-webkit-input-placeholder {
 .van-picker-column__item--selected {
     font-weight: 400;
 }
+
 .van-nav-bar .van-icon {
     color: $green;
 }
@@ -29,6 +30,14 @@ input::-webkit-input-placeholder {
 .van-nav-bar__title {
     font-weight: normal;
 }
+
+//.load-refresh-wrapper .refresh-wraper {
+//    color: $green!important;
+//}
+//.load-refresh-wrapper .loadmore-wrapper {
+//    color: $green!important;
+//}
+
 .own-btns {
     height: rem(44);
     margin-bottom: rem(6);
