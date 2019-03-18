@@ -30,7 +30,21 @@ input::-webkit-input-placeholder {
 .van-nav-bar__title {
     font-weight: normal;
 }
-
+/* ed-tab 效果 */
+.ed-tab-active-bar {
+    &.active {
+        background: $green!important;
+    }
+}
+.ed-tab-item {
+    &.active {
+        color: $green!important;
+    }
+}
+.van-swipe-item {
+    min-height: 400px;
+}
+/* ed-tab 效果 */
 //.load-refresh-wrapper .refresh-wraper {
 //    color: $green!important;
 //}

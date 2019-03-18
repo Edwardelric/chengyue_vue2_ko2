@@ -6,6 +6,8 @@ import {
 	Row, Col,
 	Icon,
 	Swipe, SwipeItem,
+	PullRefresh, List, Cell,
+	Loading,
 	NavBar,
 	Field, Search, Button,
 	Area, AddressEdit,
@@ -20,6 +22,8 @@ Vue.use(Ajax)
 	.use(Row).use(Col)
 	.use(Icon)
 	.use(Swipe).use(SwipeItem)
+	.use(PullRefresh).use(List).use(Cell)
+	.use(Loading)
 	.use(NavBar)
 	.use(Field).use(Search).use(Button)
 	.use(Area).use(AddressEdit)

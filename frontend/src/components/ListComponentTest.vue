@@ -1,32 +1,29 @@
 <template>
     <div class="goods-list">
         <ed-tab
-            v-model="tabVal"
-            :options="tabOptions"
-            @change="tabChangeHandler"
+                v-model="tabVal"
+                :options="tabOptions"
+                @change="tabChangeHandler"
         ></ed-tab>
-        <van-swipe
-            :autoplay="0"
-            :initial-swipe="swiperVal"
-            :show-indicators="false"
-            :loop="false"
-            :touchable="true"
-            @change="swiperChangeHandler"
+        <ed-swiper
+                v-model="swiperVal"
+                :options="swiperOptions"
+                @change="swiperChangeHandler"
         >
-            <van-swipe-item v-for="(swiperItem, swiperIndex) in users" :key="swiperIndex">
+            <template slot="swiperTmp" slot-scope="props">
                 <LoadMore
-                    v-model="loading[swiperIndex]"
-                    :finished="finished[swiperIndex]"
-                    loadingText="加载中..."
-                    finishedText="没有更多了"
-                    @refresh="refresh(swiperIndex)"
-                    @load="load(swiperIndex)"
+                        v-model="loading[0]"
+                        v-bind="options[0]"
+                        @refresh="refresh(0)"
+                        @loadMore="loadMore(0)"
                 >
+                    <p slot="refreshDesc" class="loading-bg">下拉加载</p>
+                    <p slot="refreshNoData" class="loading-bg">开始加载</p>
                     <ul>
-                        <li class="flex company-item" v-for="(item, index) in listData" :key="index" @click="gotoDetail(listData[index])">
+                        <li class="flex company-item" v-for="(item, index) in listData[props.$index]" :key="index" @click="gotoDetail(listData[props.$index])">
                             <div class="company-logo"><img :src="item.logo"/></div>
                             <div class="intro">
-                                <h5>{{swiperIndex}}: {{index}}: {{item.product}}</h5>
+                                <h5>{{item.product}}</h5>
                                 <span>{{item.companyName}}</span>
                                 <dl>
                                     <dt>客户群: </dt>
@@ -37,9 +34,11 @@
                             </div>
                         </li>
                     </ul>
+                    <p slot="loadMoreDesc" class="loading-bg">当前正在加载中...</p>
+                    <p slot="loadMoreNoData" class="loadMoreNoData">暂无更多数据</p>
                 </LoadMore>
-            </van-swipe-item>
-        </van-swipe>
+            </template>
+        </ed-swiper>
     </div>
 </template>
 
@@ -49,16 +48,17 @@
 	import LoadMore from './ed-load-more/index';
 	import listData from '../../mock/goods';
 	import EdTab from '@/components/ed-tab';
+	import EdSwiper from '@/components/ed-swiper';
 
 	export default {
 		data() {
 			return {
 				users: [
 					{id: 0, name: '张三', age: 20},
-					// {id: 1, name: '李四', age: 22},
-					// {id: 2, name: '王五', age: 27},
-					// {id: 3, name: '张龙', age: 27},
-					// {id: 4, name: '赵虎', age: 27}
+					{id: 1, name: '李四', age: 22},
+					{id: 2, name: '王五', age: 27},
+					{id: 3, name: '张龙', age: 27},
+					{id: 4, name: '赵虎', age: 27}
 				],
 
 				tabVal: 0,
@@ -73,23 +73,40 @@
 					canViewItemNum: 3
 				},
 				swiperVal: 0,
-
+				swiperOptions: {
+					items: [
+						{src: '/static/11.jpeg'},
+						// {src: '/static/22.jpeg'},
+						// {src: '/static/33.jpeg'},
+						// {src: '/static/44.jpg'},
+						// {src: '/static/55.jpg'}
+					],
+					autoplay: 0,
+					loop: false
+				},
 				active: 0,
+				listData: [
+					listData.slice(),
+					listData.slice(),
+					listData.slice()
+				],
 				loading: [
-					false,
-					false,
 					false,
 					false,
 					false
 				],
-				finished: [
-				    false,
-                    false,
-                    false,
-					false,
-					false
-                ],
-				listData: listData.slice()
+				options: [
+					{
+						refreshNoData: false,
+						loadMoreNoData: false
+					}, {
+						refreshNoData: false,
+						loadMoreNoData: false
+					}, {
+						refreshNoData: false,
+						loadMoreNoData: false
+					},
+				]
 			};
 		},
 		created() {
@@ -107,37 +124,37 @@
 				this.$router.push({name: 'Goods', query: {goodData}})
 			},
 			refresh(index) {
+				console.log(1, this.loading);
 				setTimeout(() => {
 					this.listData[index].unshift(this.listData[index].length + 1);
 					// 加载状态结束
-					this.loading.splice(index, 1, false);
-					// this.finished.splice(0, 1, true);
+					this.loading.splice(0, 1, false);
 					// 数据全部加载完成
 					// if (this.listData[index].length >= 2) {
 					// 	this.options[index].loadMoreNoData = true;
 					// }
-				}, 500);
+				}, 1200);
 			},
-			load(index) {
-				this.loading.splice(index, 1, false);
+			loadMore(index) {
 				setTimeout(() => {
 					for (let i = 0; i < 5; i++) {
-						this.listData.push(this.listData.length + 1);
+						this.listData[index].push(this.listData[index].length + 1);
 					}
-					//加载状态结束
+					// 加载状态结束
+					this.loading.splice(0, 1, false);
 
-					// this.finished.splice(0, 1, true);
 					// 数据全部加载完成
 					// if (this.listData[index].length >= 2) {
 					// this.options[index].loadMoreNoData = true;
 					// }
-				}, 500);
+				}, 600);
 			}
 		},
 		mounted() {},
 		components: {
 			LoadMore,
-			EdTab
+			EdTab,
+			EdSwiper
 		}
 	};
 </script>
@@ -145,16 +162,6 @@
 <style lang="scss">
     @import "../assets/scss/_mixins";
 
-    .ed-tab {
-        position: fixed!important;
-        top: rem(58);
-        left: 0;
-        width: 100%;
-        z-index: 99;
-    }
-    .van-swipe {
-        margin-top: 100px;
-    }
     .goods-list {
         height: 100%;
         .ed-swiper-wrapper {

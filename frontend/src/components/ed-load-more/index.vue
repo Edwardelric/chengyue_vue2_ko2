@@ -5,103 +5,117 @@
         @touchmove="touchMoveHandler"
         @touchend="touchEndHandler"
     >
-        <div class="refresh-wraper" v-if="enableRefresh">
-            <div v-if="!refreshNoData">
-                <span v-if="value">加载中...</span>
-                <div v-if="!value">
-                    <span v-if="refreshNoData">暂无更新数据</span>
-                    <span v-if="!refreshNoData">
-                        {{statusTxt ? statusTxt + '即可刷新...' : ''}}
-                    </span>
-                </div>
+        <slot :name="status">
+            <div class="refresh-txt">
+                <div
+                    v-if="status === 'pulling' || status === 'loosing'"
+                    v-text="finished ? finishedText : text"
+                ></div>
+
+                <div v-else v-text="text"></div>
             </div>
-        </div>
-        <slot></slot>
-        <div class="loadmore-wrapper" v-if="enableLoadMore">
-            <div v-if="value">加载中...</div>
-            <div v-if="!value">
-                <span v-if="loadMoreNoData">无更多数据</span>
-            </div>
-        </div>
+        </slot>
+        <slot/>
+        <slot name="reach-bottom">
+            <span>{{value}}{{finished}}</span>
+            <div class="load-txt"
+                v-text="finished ? finishedText : '加载中...'"
+            ></div>
+        </slot>
+        <!--<div class="refresh-wraper" v-if="enableRefresh">-->
+            <!--<div v-if="!refreshNoData">-->
+                <!--<span v-if="value"><van-loading />加载中...</span>-->
+                <!--<div v-if="!value">-->
+                    <!--<span v-if="refreshNoData">暂无更新数据</span>-->
+                    <!--<span v-if="!refreshNoData">-->
+                        <!--{{statusTxt ? statusTxt + '即可刷新...' : ''}}-->
+                    <!--</span>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<slot></slot>-->
+        <!--<div class="loadmore-wrapper" v-if="enableLoadMore">-->
+            <!--<div v-if="value">加载中...</div>-->
+            <!--<div v-if="!value">-->
+                <!--<span v-if="loadMoreNoData">无更多数据</span>-->
+            <!--</div>-->
+        <!--</div>-->
     </div>
 </template>
 
 <script type="text/ecmascript-6">
     import {ScrollTools, Throttle, OnEvent, OffEvent, Touch} from '../utils/index.js';
-    import EdSpinner from '../ed-spinner/index.vue';
 
 	export default {
         name: 'EdLoadMore',
         mixins: [Touch],
         props: {
-            value: {
-                type: Boolean,
-                default: false
-            },
-            duration: {
-                type: Number,
-                default: 300
-            },
 			immediateCheck: {
-				type: Boolean,
-				default: false
-			},
-			enableRefresh: {
 				type: Boolean,
 				default: true
 			},
-            enableLoadMore: {
-                type: Boolean,
-                default: true
+            value: {
+				type: Boolean,
+				default: false
+			},
+            finished: {
+			    type: Boolean,
+                default: false
             },
+			finishedText: {
+			    type: String,
+                default: '没有更多了'
+            },
+            pullingText: {
+                type: String,
+                default: '下拉即可加载'
+            },
+            loosingText: {
+                type: String,
+                default: '释放即可加载'
+            },
+            loadingText: {
+                type: String,
+                default: '加载中...'
+            },
+			animationDuration: {
+				type: Number,
+				default: 300
+			},
             distance: {
             	type: Number,
                 default: 10
-            },
-            refreshNoData: {
-                type: Boolean,
-                default: false
-            },
-			loadMoreNoData: {
-                type: Boolean,
-                default: false
             }
         },
 		data() {
 			return {
                 scrollEventTarget: '',
                 binded: false,
-                untouchable: false,
                 moveDistance: 0,
                 status: '',
-                statusTxt: '',
-				touched: false,
 				additionalX: 50,
-				direction: 'vertical'
+				direction: 'vertical',
+				duration: 0
             };
 		},
         mounted() {
             this.scrollEventTarget = ScrollTools.getScrollEventTarget(this.$el);
-                if (this.enableLoadMore) {
-                    this.handler(true);
-                if (this.immediateCheck) {
-                    this.check();
-                }
+            this.handler(true);
+            if (this.immediateCheck) {
+				//this.$emit('load', 'load');
             }
-        },
-        components: {
-            EdSpinner
         },
         methods: {
             touchStartHandler(event) {
-            	this.touched = true;
-                if (!this.untouchable && this.getCeiling() && this.enableRefresh) {
+                if (!this.untouchable && this.getCeiling()) {
+					this.duration = 0;
                     this.moveDistance = 0;
                     this.touchStart(event);
                 }
             },
             touchMoveHandler(event) {
-                if (this.untouchable && !this.enableRefresh) {return;}
+                if (this.untouchable) {return;}
+				this.duration = 0;
                 this.touchMove(event);
                 if (!this.ceiling && this.getCeiling()) {
                     this.moveDistance = 0;
@@ -114,7 +128,8 @@
                 }
             },
             touchEndHandler() {
-                if (this.untouchable && !this.enableRefresh) {return;}
+                if (this.untouchable) {return;}
+				this.duration = this.animationDuration;
                 if (this.ceiling && this.deltaY) {
                     if (this.status === 'loosing') {
                         this.getStatus(this.additionalX, true);
@@ -136,10 +151,8 @@
             getStatus: function getStatus(moveDistance, isLoading) {
             	this.moveDistance = moveDistance;
                 let status = isLoading ? 'loading' : moveDistance === 0 ? '' : moveDistance < this.additionalX * 1.5 ? 'pulling' : 'loosing';
-                console.log(status, 1, this.status);
                 if (status !== this.status) {
                     this.status = status;
-                    this.statusTxt = ({pulling: '下拉', loosing: '释放'})[status];
                 }
             },
             handler(flag) {
@@ -149,7 +162,7 @@
                 }
             },
             check() {
-                if (this.value || this.loadMoreNoData) { return;}
+                if (this.value || this.finished) { return;}
                 let reachBottom = false;
                 let el = this.$el;
                 let scrollEventTarget = this.scrollEventTarget;
@@ -161,28 +174,31 @@
                     let elementBottom = ScrollTools.getElementTop(el) - ScrollTools.getElementTop(scrollEventTarget) + el.offsetHeight + viewportScrollTop;
                     reachBottom = viewportBottom + this.distance >= elementBottom;
                 }
+                console.log('reachBottom', reachBottom);
                 if (reachBottom) {
                     this.$emit('input', true);
-                    this.$emit('loadMore', 'loadMore');
+                    this.$emit('load');
                 }
             }
         },
         computed: {
+			untouchable() {
+			    return this.status === 'loading' || this.disabled;
+            },
+			text() {
+			    return this[`${this.status}Text`];
+            },
             transform() {
-            	if (this.touched) {
-            		return {
-                        transition: `all ${this.duration}ms linear`,
-                        transform: `translate3d(0, ${this.moveDistance}px, 0)`
-                    }
-				} else {
-            		return {};
+                return {
+                    transition: `all ${this.duration}ms linear`,
+                    transform: `translate3d(0, ${this.moveDistance}px, 0)`
                 }
-            }
+			}
         },
         watch: {
             value(val) {
-            	console.log('watchValue', val);
-                if (this.getCeiling() && this.enableRefresh) {
+                if (this.getCeiling()) {
+                	this.duration = this.animationDuration;
                     this.getStatus(val ? this.additionalX : 0, val);
                 }
             }
@@ -195,14 +211,14 @@
     .load-refresh-wrapper {
         position: relative;
         transform: translate3d(0px, 0px, 0px);
-        .refresh-wraper {
+        .refresh-txt {
             position: absolute;
             left: 0;
             top: rem(-50);
             width: 100%;
             height: rem(50);
             color: $gray;
-            font-size: 14px;
+            font-size: 12px;
             text-align: center;
             display: flex;
             justify-content: center;
@@ -212,11 +228,13 @@
                 line-height: rem(20);
             }
         }
-        .loadmore-wrapper {
+        .load-txt {
             display: flex;
             justify-content: center;
             align-items: center;
             height: rem(40);
+            color: $gray;
+            font-size: 12px;
         }
     }
 </style>
