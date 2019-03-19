@@ -75,13 +75,13 @@
 <style lang="scss">
     @import "../assets/scss/_mixins";
 
-    .header-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 100;
-        width: 100%;
-    }
+    /*.header-wrapper {*/
+        /*position: fixed;*/
+        /*top: 0;*/
+        /*left: 0;*/
+        /*z-index: 100;*/
+        /*width: 100%;*/
+    /*}*/
     .header {
         height: rem(58);
         padding: 0 rem(16);

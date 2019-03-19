@@ -4,140 +4,127 @@
             v-model="tabVal"
             :options="tabOptions"
             @change="tabChangeHandler"
+            :class="{active: strikyFlag}"
         ></ed-tab>
-        <van-swipe
-            :autoplay="0"
-            :initial-swipe="swiperVal"
-            :show-indicators="false"
-            :loop="false"
-            :touchable="true"
-            @change="swiperChangeHandler"
+        <ed-pull-refresh
+            v-model="refreshing"
+            @refresh="onRefresh"
+            :style="{marginTop: strikyFlag ? 40 : 0}"
         >
-            <van-swipe-item v-for="(swiperItem, swiperIndex) in users" :key="swiperIndex">
-                <LoadMore
-                    v-model="loading[swiperIndex]"
-                    :finished="finished[swiperIndex]"
-                    loadingText="加载中..."
-                    finishedText="没有更多了"
-                    @refresh="refresh(swiperIndex)"
-                    @load="load(swiperIndex)"
-                >
-                    <ul>
-                        <li class="flex company-item" v-for="(item, index) in listData" :key="index" @click="gotoDetail(listData[index])">
-                            <div class="company-logo"><img :src="item.logo"/></div>
-                            <div class="intro">
-                                <h5>{{swiperIndex}}: {{index}}: {{item.product}}</h5>
-                                <span>{{item.companyName}}</span>
-                                <dl>
-                                    <dt>客户群: </dt>
-                                    <dd v-for="(subItem, subIndex) in item.client" :key="subIndex">{{subItem}}</dd>
-                                </dl>
-                            </div>
-                            <div class="price">￥{{item.price}}
-                            </div>
-                        </li>
-                    </ul>
-                </LoadMore>
-            </van-swipe-item>
-        </van-swipe>
+            <ed-load-more
+                v-model="loading"
+                :finished="finished"
+                @load="onLoad"
+            >
+                <ul>
+                    <li class="flex company-item" v-for="(item, index) in listData" :key="index" @click="gotoDetail(listData)">
+                        <div class="company-logo"><img :src="item.logo"/></div>
+                        <div class="intro">
+                            <h5>{{item.product}}</h5>
+                            <span>{{item.companyName}}</span>
+                            <dl>
+                                <dt>客户群: </dt>
+                                <dd v-for="(subItem, subIndex) in item.client" :key="subIndex">{{subItem}}</dd>
+                            </dl>
+                        </div>
+                        <div class="price">￥{{item.price}}
+                        </div>
+                    </li>
+                </ul>
+            </ed-load-more>
+        </ed-pull-refresh>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
 	import {URL} from '@/utils/serviceAPI.js';
-	import {Toast} from 'vant';
-	import LoadMore from './ed-load-more/index';
 	import listData from '../../mock/goods';
 	import EdTab from '@/components/ed-tab';
+	import EdSwiper from '@/components/ed-swiper';
+	import EdPullRefresh from '@/components/ed-pull-refresh'
+	import EdLoadMore from './ed-load-more/index';
+	import {ScrollTools} from './utils/index.js';
 
 	export default {
 		data() {
 			return {
-				users: [
-					{id: 0, name: '张三', age: 20},
-					// {id: 1, name: '李四', age: 22},
-					// {id: 2, name: '王五', age: 27},
-					// {id: 3, name: '张龙', age: 27},
-					// {id: 4, name: '赵虎', age: 27}
-				],
-
-				tabVal: 0,
+                tabVal: 0,
 				tabOptions: {
 					items: [
 						{label: '玻璃0'},
-						// {label: '铝合金1'},
-						// {label: '钢化门2'},
-						// {label: '铝合金3'},
-						// {label: '钢化门4'}
+						{label: '铝合金1'},
+						{label: '钢化门2'},
+						{label: '铝合金3'},
+						{label: '钢化门4'}
 					],
 					canViewItemNum: 3
 				},
 				swiperVal: 0,
-
-				active: 0,
-				loading: [
-					false,
-					false,
-					false,
-					false,
-					false
-				],
-				finished: [
-				    false,
-                    false,
-                    false,
-					false,
-					false
-                ],
-				listData: listData.slice()
+				swiperOptions: {
+					items: [
+						{src: '/static/11.jpeg'},
+						// {src: '/static/22.jpeg'},
+						// {src: '/static/33.jpeg'},
+						// {src: '/static/44.jpg'},
+						// {src: '/static/55.jpg'}
+					],
+					autoplay: 0,
+					loop: false
+				},
+				listData: [],
+				refreshing: false,
+				loading: false,
+				finished: false,
+                strikyFlag: false
 			};
 		},
 		created() {
 		},
+		mounted() {
+			this.scroller = ScrollTools.getScrollEventTarget(this.$el);
+			window.addEventListener('scroll', (event) => {
+			    let scrolltop = ScrollTools.getScrollTop(this.scroller);
+				this.strikyFlag = scrolltop >= 56;
+			}, false);
+		},
 		methods: {
 			tabChangeHandler(index) {
-				console.log('tabChange', index);
 				this.swiperVal = index
 			},
 			swiperChangeHandler(index) {
-				console.log('swiperChange', index);
 				this.tabVal = index;
 			},
 			gotoDetail(goodData) {
 				this.$router.push({name: 'Goods', query: {goodData}})
 			},
-			refresh(index) {
+			onRefresh() {
 				setTimeout(() => {
-					this.listData[index].unshift(this.listData[index].length + 1);
-					// 加载状态结束
-					this.loading.splice(index, 1, false);
-					// this.finished.splice(0, 1, true);
-					// 数据全部加载完成
-					// if (this.listData[index].length >= 2) {
-					// 	this.options[index].loadMoreNoData = true;
-					// }
+                    for (let i = 0; i < 10; i++) {
+                        const text = this.listData.length + 1;
+                        this.listData.unshift(text < 10 ? '0' + text : text);
+                    }
+				    this.refreshing = false;
 				}, 500);
-			},
-			load(index) {
-				this.loading.splice(index, 1, false);
+            },
+			onLoad() {
 				setTimeout(() => {
-					for (let i = 0; i < 5; i++) {
-						this.listData.push(this.listData.length + 1);
-					}
-					//加载状态结束
+                    for (let i = 0; i < 10; i++) {
+                        const text = this.listData.length + 1;
+                        this.listData.push(text < 10 ? '0' + text : text);
+                    }
+                    this.loading = false;
 
-					// this.finished.splice(0, 1, true);
-					// 数据全部加载完成
-					// if (this.listData[index].length >= 2) {
-					// this.options[index].loadMoreNoData = true;
-					// }
-				}, 500);
+                    if (this.listData.length >= 40) {
+                        this.finished = true;
+                    }
+                }, 800);
 			}
 		},
-		mounted() {},
 		components: {
-			LoadMore,
-			EdTab
+			EdTab,
+			EdSwiper,
+			EdPullRefresh,
+			EdLoadMore
 		}
 	};
 </script>
@@ -146,22 +133,21 @@
     @import "../assets/scss/_mixins";
 
     .ed-tab {
-        position: fixed!important;
-        top: rem(58);
-        left: 0;
-        width: 100%;
-        z-index: 99;
+        &.active {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 99;
+        }
     }
-    .van-swipe {
-        margin-top: 100px;
-    }
+
     .goods-list {
-        height: 100%;
         .ed-swiper-wrapper {
             overflow-y: scroll;
         }
         .company-item {
-            margin-bottom: rem(10);
+            margin-top: rem(10);
             padding: 0 rem(16) rem(10) rem(16);
             border-bottom: rem(6) solid $gray;
             .company-logo {
